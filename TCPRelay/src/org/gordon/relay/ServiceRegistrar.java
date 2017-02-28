@@ -30,23 +30,50 @@ public class ServiceRegistrar implements Runnable {
     private int portNumber;
     private ServerSocket listener;
     private Thread registrarThread;
+    private static volatile ServiceRegistrar instance;
     
     // Track client listeners for cleanup.
     private List<ClientListener> clientListeners = new ArrayList<>();
     
-    public ServiceRegistrar(int portNumber) {
+    /**
+     * Creates the singleton ServiceRegistrar.  There are no potential race conditions
+     * as this is called exactly once, but let's be safe.  DCL should work due to
+     * the volatile declaration of the instance.
+     * @param portNumber the port number to listen on
+     */
+    public static ServiceRegistrar instance(int portNumber) {
+        synchronized (ServiceRegistrar.class) {
+            if (instance == null) {
+                synchronized (ServiceRegistrar.class) {
+                    if (instance == null) {
+                        instance = new ServiceRegistrar(portNumber);
+                    }
+                }
+            }
+        }
+        return instance;
+    }
+
+    private ServiceRegistrar(int portNumber) {
         this.portNumber = portNumber;
     }
     
+    /**
+     * Launches the thread to listen for servers requesting proxy service.
+     * @throws IOException if the socket cannot be created
+     */
     public void start() throws IOException {
         listener = new ServerSocket(portNumber);
         registrarThread = new Thread(this);
-        //registrarThread.setDaemon(true);
         registrarThread.start();
     }
     
+   /**
+    * Make an attempt to clean up at shutdown.
+    * @throws IOException issues due to closing sockets and such
+    */
     public void shutdown() throws IOException {
-        System.out.println("SHUTDOWN!");
+        System.out.println("Shutdown initalted for Service Registrar");
         if (listener != null) {
             listener.close();
         }
@@ -58,12 +85,15 @@ public class ServiceRegistrar implements Runnable {
         }
     }
     
+    /**
+     * Gives the Relay object something to prevent it from falling off the end of
+     * the invoking method, basically.
+     */
     public void awaitCompletion() {
         try {
             registrarThread.join();
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.err.println("***Warning: Service Registrar thread was interrupted.");
         }
     }
 
@@ -75,9 +105,9 @@ public class ServiceRegistrar implements Runnable {
     public void run() {
         try {
             while (true) {
-                System.out.println("service registrar: listening on: " + listener.getLocalSocketAddress());
+                System.out.println("Service Registrar: listening for services on: " + listener.getLocalSocketAddress());
                 Socket socket = listener.accept();
-                System.out.println("accepted service registration socket: " + socket);
+                System.out.println("Service Registrar accepted service registration socket: " + socket);
                 ClientListener cl = new ClientListener(socket);
                 clientListeners.add(cl);
                 cl.start(); 

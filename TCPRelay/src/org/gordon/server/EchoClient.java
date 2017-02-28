@@ -3,6 +3,12 @@ package org.gordon.server;
 import java.io.*;
 import java.net.*;
 
+/**
+ * An interactive test client for the echo server. You will br prompted at the command line to
+ * type something, and it will be echoed back.  The loop continues until you type an EOF for input.
+ * @author Gary
+ */
+
 public class EchoClient {
     
     public static void main(String[] args) throws Exception {

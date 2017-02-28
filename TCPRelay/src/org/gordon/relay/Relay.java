@@ -3,18 +3,24 @@ package org.gordon.relay;
 import java.io.*;
 
 /** The Relay is the starting point for launching the main components.  It's main task is
- * to launch a DaemonRegistrar so servers can register with the relay.
+ * to launch a ServiceRegistrar so servers can register with the relay.
  * 
  * @author Gary
  *
  */
 public class Relay {
-    public static final int DEFAULT_LISTEN_PORT = 8087;
+    public static final int DEFAULT_LISTEN_PORT = 8080;
     
     private int portNumber;
     
     private ServiceRegistrar registrar;
 
+    /**
+     * The main entry point for the TCP Relay.  The listen port may
+     * be configured as a command line argument.
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         int portNum;
         if (args.length > 0) {
@@ -44,7 +50,7 @@ public class Relay {
     }
     
     public void beginRegistration() throws IOException {
-        registrar = new ServiceRegistrar(portNumber);
+        registrar = ServiceRegistrar.instance(portNumber);
         registrar.start();
         registrar.awaitCompletion();
     }
@@ -55,6 +61,7 @@ public class Relay {
                 registrar.shutdown();
             }
         } catch (IOException e) {
+            System.err.println("***Warning: problem shutting down Relay Server: " + e.getMessage());
         }
     }
 }
