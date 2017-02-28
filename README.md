@@ -17,7 +17,8 @@ where the -d flag is where the class files will be compiled to.
 Now to run the various programs, you should change directory to where the class files live (e.g. "demodir" above).
 
 First start the relay server:
-java -classpath . org.gordon.relay.Relay <optional port number, defaults to 8080>
+java -classpath . org.gordon.relay.Relay
+note: optional port number may be specified, defaults to 8080 as in org.gordon.relay.Relay 8080
 
 Now start the EchoServer:
 java -classpath . org.gordon.server.EchoServer localhost 8080 (use the host and port where the relay was started)
