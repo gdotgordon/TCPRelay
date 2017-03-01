@@ -86,7 +86,7 @@ public class ClientListener implements Runnable {
         // but we need to give the client a valid IP address, so we use the actual one
         // the server has connected to.
         System.out.println("Service '" + serviceName + "' has established relay address: "
-                + daemonChannel.getInetAddress().getHostName() + ":" + listener.getLocalPort());
+                + daemonChannel.getLocalAddress().getHostName() + ":" + listener.getLocalPort());
     }
 
     /**

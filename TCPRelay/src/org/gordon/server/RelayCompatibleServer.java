@@ -27,7 +27,7 @@ import java.net.Socket;
  * 
  * Given the relatively low-level of TCP, vis a vis HTTP, where we can propagate useful return error
  * messages, we are a little limited with TCP.  For now we print error messages to stderr.  In real
- * life, we would prbably add them to a log file, a la WebLogic and others of that ilk.  The policy
+ * life, we would probably add them to a log file, a la WebLogic and others of that ilk.  The policy
  * I have chosen is that an IO problem with one request is not enough to bring down the whole system,
  * but this is a policy that is not cast in stone.
  * 
@@ -69,7 +69,7 @@ public abstract class RelayCompatibleServer {
             InputStream is = cli.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String resp = br.readLine();
-            System.out.println("read: " + resp);
+            System.out.println("established relay address: " + resp);
 
             while (true) {
                 System.out.println(serverName + " get next task ...");
