@@ -63,7 +63,7 @@ public class ClientListener implements Runnable {
     }
 
     /**
-     * Starts the listener loop for client requests for this service. And
+     * Starts the listener loop for client requests for this service, and
      * advertises the host/port combination for clients to use.
      * @throws IOException if various socket-y things go wrong
      */
