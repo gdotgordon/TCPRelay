@@ -58,7 +58,7 @@ public abstract class RelayCompatibleServer {
      * to subsequent client requests.  It is up to the caller as to whether this
      * should be run in a separate thread, which would allow the regular accept()
      * logic to coexist.
-     * @throws IOException if something network-related goes wrong or a read or write
+     * @throws IOException if something network-related went wrong or a read or write
      * is unsuccessful
      */
     public void processRequests() throws IOException {

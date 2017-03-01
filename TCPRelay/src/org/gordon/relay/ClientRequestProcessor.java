@@ -36,7 +36,7 @@ public class ClientRequestProcessor implements Runnable {
 
     /**
      * The main logic to process a request.  The trick is to concurrently process the
-     * input and output (in spearate threads) using the IOTransfer object bi-directionally.
+     * input and output (in separate threads) using the IOTransfer object bi-directionally.
      */
     @Override
     public void run() {
