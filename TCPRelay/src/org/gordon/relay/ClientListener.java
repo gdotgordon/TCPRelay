@@ -120,7 +120,7 @@ public class ClientListener implements Runnable {
                     // writes to the control socket.  If the server goes away, the read
                     // should throw an error, as TCP is stateful.
                     serverListener = new ServerSocket(0);
-                    pw.println(serverListener.getInetAddress().getHostName() + ":" + serverListener.getLocalPort());
+                    pw.println(daemonChannel.getLocalAddress().getHostName() + ":" + serverListener.getLocalPort());
                     pw.flush();
                     String serviceName = br.readLine();
                     if (serviceName == null) {
@@ -136,7 +136,7 @@ public class ClientListener implements Runnable {
                     ClientRequestProcessor proc = new ClientRequestProcessor(socket, daemonSocket);
                     proc.start();
                 } catch (IOException e) {
-                    System.err.println("***Error handling clinet request: " + e.getMessage());
+                    System.err.println("***Error handling client request: " + e.getMessage());
                 } finally {
                     try {
                         if (serverListener != null) {
