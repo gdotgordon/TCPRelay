@@ -1,8 +1,15 @@
 # TCPRelay
-Implementation of TCP relay in Java plus a test Echo Server and test clients for that server.
+Implementation of TCP relay in Java plus a test Echo Server and test clients for that server.  The wrinkle in the requirement is that the Relay must be able to talk to clients and servers through a firewall.  This means all contact must be initiated by the client or server, not the Relay.
 
-The design rationale will be fleshed out here.  The are two packages, the "relay" and "server" packages.  For now,
-please see the main comments of each file to understand the design.
+The design apporach is for each server wishing to register with the Relay to establish a "control channel" with the server.  This channel will both establish a proxy in the relay for the server and notify the server when requests arrive on the relay once the proxy is established.  Therefore the relay needs a few essential components:
+
+1. A channel to listen for server registration requests.
+2. A channel to handle client requests.
+3. A mechanism for notifying the server of a new client request and a way to get the request bytes to/from the server.
+
+Further, to maintain performance, we need to offload the processing of each client request to a new thread, and similarly, the server must not get blocked handling any given request.
+
+The are two packages, the "relay" and "server" packages.  Please see the main comments of each file for more details on the design and implementation details.
 
 As far as building, you will require the JDK (JDK 8) to be able to compile the files.  You could also import the project into
 Eclipse, in theory.
@@ -31,5 +38,3 @@ Finally launch the test programs, using:
 java -classpath . org.gordon.server.EchoClient localhost 64746 (use the proper port number advertised though!)
 java -classpath . org.gordon.server.EchoStressClient localhost 64746 (use the proper port number advertised though!)
 
-I don't think it is great to upload binaries to Git, so I can compile and provide a jar file with slightly different
-instructions if needed.
