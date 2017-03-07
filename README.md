@@ -1,7 +1,7 @@
 # TCPRelay
-This was a test question i was given.  The goal is to Implement of TCP relay in Java plus a test Echo Server and test clients for that server.  The wrinkle in the requirement is that the Relay must be able to talk to clients and servers through a firewall.  This means all contact must be initiated by the client or server, not the Relay.
+This was a test question I was given.  The goal is to Implement a TCP relay in Java plus a test Echo Server and test clients for that server.  The wrinkle in the requirement is that the Relay must be able to talk to clients and servers through a firewall.  This means all contact must be initiated by the client or server, not the Relay.
 
-The design apporach is for each server wishing to register with the Relay to establish a "control channel" with the server.  This channel will both establish a proxy in the relay for the server and notify the server when requests arrive on the relay once the proxy is established.  Therefore the relay needs a few essential components:
+The design approach is for each server wishing to register with the Relay to establish a "control channel" with the server.  This channel will both establish a proxy in the relay for the server and notify the server when requests arrive on the relay once the proxy is established.  Therefore the relay needs a few essential components:
 
 1. A channel to listen for server registration requests.
 2. A channel to handle client requests.
