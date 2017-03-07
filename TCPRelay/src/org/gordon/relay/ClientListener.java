@@ -109,7 +109,7 @@ public class ClientListener implements Runnable {
             while (true) {
                 ServerSocket serverListener = null;
                 try {
-                    System.out.println("Clinet Listener accepting client requests on port " + listener.getLocalPort() + "...");
+                    System.out.println("Client Listener accepting client requests on port " + listener.getLocalPort() + "...");
                     Socket socket = listener.accept();
                     serverListener = null;
 
