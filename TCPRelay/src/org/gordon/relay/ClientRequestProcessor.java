@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.logging.Logger;
 
 /**
  * To achieve concurrency, each client request is run in a separate thread here.
@@ -15,6 +16,7 @@ public class ClientRequestProcessor implements Runnable {
 
     private Socket clientSocket;
     private Socket daemonSocket;
+    private Logger logger;
 
     /**
      * Create a request processor for the client request.
@@ -24,6 +26,7 @@ public class ClientRequestProcessor implements Runnable {
     public ClientRequestProcessor(Socket clientSocket, Socket daemonSocket) {
         this.clientSocket = clientSocket;
         this.daemonSocket = daemonSocket;
+        this.logger = Relay.logger;
     }
 
     /**
@@ -54,24 +57,24 @@ public class ClientRequestProcessor implements Runnable {
                 toServer.join();
                 fromServer.join();
             } catch (InterruptedException e) {
-                System.err.println("***Warning: the client request thread was interrupted");
+               logger.warning("the client request thread was interrupted");
             }
         } catch (IOException e) {
-            System.err.println("***Error: the client request received an error: " + e.getMessage());
+            logger.warning(() -> "the client request received an error: " + e.getMessage());
         } finally {
             try {
                 if (clientSocket != null) {
                     clientSocket.close();
                 }
             } catch (IOException e) {
-                System.err.println("***Warning: cannot close client socket: " + e.getMessage());
+                logger.warning(() -> "cannot close client socket: " + e.getMessage());
             }
             try {
                 if (daemonSocket != null) {
                     daemonSocket.close();
                 }
             } catch (IOException e) {
-                System.err.println("***Warning: cannot close server socket: " + e.getMessage());
+                logger.warning(() -> "cannot close server socket: " + e.getMessage());
             }
         }
     }
@@ -114,7 +117,7 @@ public class ClientRequestProcessor implements Runnable {
                 }
                 writerSocket.shutdownOutput();
             } catch (IOException e) {
-                System.err.println("***Error transferring bytes" + e.getMessage());
+                Relay.logger.severe(() -> "error transferring bytes" + e.getMessage());
             }
         }
     }

@@ -1,13 +1,20 @@
 package org.gordon.server;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 /**
  * A test for the echo server that tests both big (10K-ish) payloads and also
  * concurrent requests with the same big payload test.  There is a delay of three
  * seconds in the threading test to try invoking this more than once at the same time. 
  */
-import java.net.*;
+
 
 public class EchoStressClient {
     

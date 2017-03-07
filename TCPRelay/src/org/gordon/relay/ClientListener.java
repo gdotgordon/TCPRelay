@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.logging.Logger;
 
 /**
  * The Client Listener is the main point of processing for requests made by
@@ -29,6 +31,7 @@ public class ClientListener implements Runnable {
     private ServerSocket listener;
     private Socket daemonChannel;
     private Thread listenerThread;
+    private Logger logger;
 
     // These are used for line-oriented character communications over the
     // control channel
@@ -52,6 +55,7 @@ public class ClientListener implements Runnable {
         OutputStream os = daemonChannel.getOutputStream();
         this.pw = new PrintWriter(new OutputStreamWriter(os));
         this.br = new BufferedReader(new InputStreamReader(is));
+        this.logger = Relay.logger;
     }
 
     /**
@@ -72,20 +76,22 @@ public class ClientListener implements Runnable {
         listenerThread.start();
         
         // Block until the server-side syncs up to receive the host:port combo.
-        System.out.println("Client Listener: awaiting registration from server ...");
+        logger.info("Client Listener: awaiting registration from server ...");
         String serviceName = br.readLine();
         if (serviceName == null) {
-            throw new IOException("service name not read");
+            logger.severe("service name not read from server!");
+            throw new IOException("Server connection not established for client request.");
         }
         this.serviceName = serviceName;
-        System.out.println("'" + serviceName + " 'has registered");
+        
+        // Provide the server with its host and port.
         pw.println(daemonChannel.getInetAddress().getHostName() + ":" + listener.getLocalPort());
         pw.flush();
 
         // The ServerSocket lists it's address as 0.0.0.0, which is a sort of wildcard,
         // but we need to give the client a valid IP address, so we use the actual one
         // the server has connected to.
-        System.out.println("Service '" + serviceName + "' has established relay address: "
+        logger.info(() -> "Service '" + serviceName + "' has established relay address: "
                 + daemonChannel.getLocalAddress().getHostName() + ":" + listener.getLocalPort());
     }
 
@@ -109,7 +115,8 @@ public class ClientListener implements Runnable {
             while (true) {
                 ServerSocket serverListener = null;
                 try {
-                    System.out.println("Client Listener accepting client requests on port " + listener.getLocalPort() + "...");
+                    logger.info(() -> "Client Listener accepting client requests on port "
+                            + listener.getLocalPort() + "...");
                     Socket socket = listener.accept();
                     serverListener = null;
 
@@ -124,26 +131,30 @@ public class ClientListener implements Runnable {
                     pw.flush();
                     String serviceName = br.readLine();
                     if (serviceName == null) {
-                        throw new IOException("ACK not read");
+                        logger.severe(() -> String.format("ACK for client request not read from server '%s'",
+                                getserviceName()));
+                        // We really don't want to kill the server due to one failure.  In real
+                        // life we might consider doing so if the problem persists.
+                        continue;
                     } else {
-                        System.out.println("read ACK, server has connected for request processing");
+                        logger.info("read ACK, server has connected for request processing");
                     }
 
                     Socket daemonSocket = serverListener.accept();
-                    System.out.println("daemon server has connected to client request!");
+                    logger.info(() -> String.format("server '%s' has connected to client request", serviceName));
 
                     // Now we can launch the request processing in a new thread.
                     ClientRequestProcessor proc = new ClientRequestProcessor(socket, daemonSocket);
                     proc.start();
                 } catch (IOException e) {
-                    System.err.println("***Error handling client request: " + e.getMessage());
+                    logger.severe(() -> "handling client request: " + e.getMessage());
                 } finally {
                     try {
                         if (serverListener != null) {
                             serverListener.close();
                         }
                     } catch (IOException e) {
-                        System.err.println("***Warning cannot close listener socket: " + e.getMessage());
+                        logger.warning(() -> "cannot close listener socket: " + e.getMessage());
                     }
                 }
             }
@@ -151,6 +162,7 @@ public class ClientListener implements Runnable {
             try {
                 listener.close();
             } catch (IOException e) {
+                logger.warning(() -> "cannot close client listener socket: " + e.getMessage());
             }
         }
     }

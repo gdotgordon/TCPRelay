@@ -73,7 +73,7 @@ public class ServiceRegistrar implements Runnable {
     * @throws IOException issues due to closing sockets and such
     */
     public void shutdown() throws IOException {
-        System.out.println("Shutdown initalted for Service Registrar");
+        Relay.logger.info("Shutdown initiated for Service Registrar");
         if (listener != null) {
             listener.close();
         }
@@ -93,7 +93,7 @@ public class ServiceRegistrar implements Runnable {
         try {
             registrarThread.join();
         } catch (InterruptedException e) {
-            System.err.println("***Warning: Service Registrar thread was interrupted.");
+            Relay.logger.warning("Service Registrar thread was interrupted.");
         }
     }
 
@@ -105,9 +105,10 @@ public class ServiceRegistrar implements Runnable {
     public void run() {
         try {
             while (true) {
-                System.out.println("Service Registrar: listening for services on: " + listener.getLocalSocketAddress());
+                Relay.logger.info(
+                        () -> "Service Registrar: listening for services on: " + listener.getLocalSocketAddress());
                 Socket socket = listener.accept();
-                System.out.println("Service Registrar accepted service registration socket: " + socket);
+                Relay.logger.info(() -> "Service Registrar accepted service registration socket: " + socket);
                 ClientListener cl = new ClientListener(socket);
                 clientListeners.add(cl);
                 cl.start(); 
@@ -115,13 +116,13 @@ public class ServiceRegistrar implements Runnable {
         } catch (IOException e) {
             System.out.println(e);
         } finally {
-            System.out.println("closing registrar listener");
+            Relay.logger.info("closing registrar listener");
             try {
                 if (listener != null) {
                     listener.close();
                 }
             } catch (IOException e) {
-                System.out.println("closing registrar socket: " + e.getMessage());
+                Relay.logger.warning(() -> "closing registrar socket: " + e.getMessage());
             }
         }
     }
