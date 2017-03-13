@@ -42,12 +42,10 @@ public class ServiceRegistrar implements Runnable {
      * @param portNumber the port number to listen on
      */
     public static ServiceRegistrar instance(int portNumber) {
-        synchronized (ServiceRegistrar.class) {
-            if (instance == null) {
-                synchronized (ServiceRegistrar.class) {
-                    if (instance == null) {
-                        instance = new ServiceRegistrar(portNumber);
-                    }
+        if (instance == null) {
+            synchronized (ServiceRegistrar.class) {
+                if (instance == null) {
+                    instance = new ServiceRegistrar(portNumber);
                 }
             }
         }
